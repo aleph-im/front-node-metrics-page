@@ -1,0 +1,106 @@
+import { Data } from "plotly.js";
+import React, { useState } from "react";
+import MetricsPlot from "../components/MetricsPlot";
+import useFetchNodes from "../hooks/useFetchNodes";
+import useFetchMetrics from "../hooks/useFetchMetrics";
+import useFilteredNodes from "../hooks/useFilteredNodes";
+import { MetricData, Node } from "../types";
+import NodeDatalist from "../components/NodeDatalist";
+import ProgressBar from "../components/ProgressBar";
+import NodeList from "../components/NodeList";
+
+const NodeMetricsPage: React.FC = () => {
+  const nodes = useFetchNodes();
+  const [selectedNode, setSelectedNode] = useState<Node | undefined>(undefined);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const filteredNodes = useFilteredNodes(nodes, searchTerm);
+  const { metricData, isLoading } = useFetchMetrics(selectedNode, nodes);
+
+  const isMetricPresent = (metric: (number | null)[]): boolean => {
+    return metric.some((value) => value !== null);
+  };
+
+  const xAxisData = metricData?.measured_at.map((timestamp) =>
+    new Date(timestamp * 1000).toLocaleString()
+  );
+
+  const metricsConfig: {
+    key: keyof MetricData;
+    name: string;
+    visible?: boolean | "legendonly";
+  }[] = [
+    { key: "base_latency", name: "Base Latency" },
+    { key: "base_latency_ipv4", name: "Base Latency IPv4" },
+    { key: "full_check_latency", name: "Full Check Latency" },
+    { key: "diagnostic_vm_latency", name: "Diagnostic VM Latency" },
+    { key: "metrics_latency", name: "Metrics Latency" },
+    { key: "aggregate_latency", name: "Aggregate Latency" },
+    { key: "file_download_latency", name: "File Download Latency" },
+    {
+      key: "pending_messages",
+      name: "Pending Messages",
+      visible: "legendonly",
+    },
+    {
+      key: "eth_height_remaining",
+      name: "ETH Height Remaining",
+      visible: "legendonly",
+    },
+  ];
+
+  const plotData: Data[] = React.useMemo(() => {
+    if (!metricData || !xAxisData) return [];
+
+    return metricsConfig.reduce<Data[]>((acc, { key, name, visible }) => {
+      const metricArray: (number | null)[] | undefined = metricData[key];
+      if (metricArray && isMetricPresent(metricArray)) {
+        acc.push({
+          x: xAxisData,
+          y: metricArray.filter((item) => item !== null) as number[], // Ensure no null values in 'y'
+          type: "scatter",
+          mode: "lines+markers",
+          name: name,
+          visible: visible,
+        });
+      }
+      return acc;
+    }, []);
+  }, [metricData, xAxisData]);
+
+  return (
+    <div className="flex flex-row">
+      <NodeList
+        nodes={filteredNodes}
+        selectedNode={selectedNode}
+        searchTerm={searchTerm}
+        onSelectNode={setSelectedNode}
+        onSearchingNode={setSearchTerm}
+        className="overflow-y-scroll h-[calc(100vh-72px)] min-w-[226px] z-40 bg-white"
+      ></NodeList>
+      <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-72px)] p-8 z-30">
+        <div className="flex flex-grow items-center justify-center w-full h-max">
+          {isLoading ? (
+            <div>
+              Loading metrics...
+              <ProgressBar isLoading={isLoading} loadDuration={12000} />
+            </div>
+          ) : metricData ? (
+            <MetricsPlot
+              plotData={plotData}
+              layout={{
+                autosize: true,
+                title: `${selectedNode?.name} Node Metrics`,
+              }}
+            />
+          ) : (
+            <div className="text-gray-500">
+              Select a node to see its metrics.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default NodeMetricsPage;
