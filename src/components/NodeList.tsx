@@ -38,7 +38,7 @@ const NodeList: React.FC<NodeListProps> = ({
           icon={<Icon name="search" size="lg" />}
         />
       </div>
-      <ul role="list" className="divide-y divide-gray-100">
+      <ul className="divide-y divide-gray-100">
         {nodes.map((node) => (
           <>
             <li

@@ -5,9 +5,32 @@ import useFetchNodes from "../hooks/useFetchNodes";
 import useFetchMetrics from "../hooks/useFetchMetrics";
 import useFilteredNodes from "../hooks/useFilteredNodes";
 import { MetricData, Node } from "../types";
-import NodeDatalist from "../components/NodeDatalist";
 import ProgressBar from "../components/ProgressBar";
 import NodeList from "../components/NodeList";
+
+const metricsConfig: {
+  key: keyof MetricData;
+  name: string;
+  visible?: boolean | "legendonly";
+}[] = [
+  { key: "base_latency", name: "Base Latency" },
+  { key: "base_latency_ipv4", name: "Base Latency IPv4" },
+  { key: "full_check_latency", name: "Full Check Latency" },
+  { key: "diagnostic_vm_latency", name: "Diagnostic VM Latency" },
+  { key: "metrics_latency", name: "Metrics Latency" },
+  { key: "aggregate_latency", name: "Aggregate Latency" },
+  { key: "file_download_latency", name: "File Download Latency" },
+  {
+    key: "pending_messages",
+    name: "Pending Messages",
+    visible: "legendonly",
+  },
+  {
+    key: "eth_height_remaining",
+    name: "ETH Height Remaining",
+    visible: "legendonly",
+  },
+];
 
 const NodeMetricsPage: React.FC = () => {
   const nodes = useFetchNodes();
@@ -23,30 +46,6 @@ const NodeMetricsPage: React.FC = () => {
   const xAxisData = metricData?.measured_at.map((timestamp) =>
     new Date(timestamp * 1000).toLocaleString()
   );
-
-  const metricsConfig: {
-    key: keyof MetricData;
-    name: string;
-    visible?: boolean | "legendonly";
-  }[] = [
-    { key: "base_latency", name: "Base Latency" },
-    { key: "base_latency_ipv4", name: "Base Latency IPv4" },
-    { key: "full_check_latency", name: "Full Check Latency" },
-    { key: "diagnostic_vm_latency", name: "Diagnostic VM Latency" },
-    { key: "metrics_latency", name: "Metrics Latency" },
-    { key: "aggregate_latency", name: "Aggregate Latency" },
-    { key: "file_download_latency", name: "File Download Latency" },
-    {
-      key: "pending_messages",
-      name: "Pending Messages",
-      visible: "legendonly",
-    },
-    {
-      key: "eth_height_remaining",
-      name: "ETH Height Remaining",
-      visible: "legendonly",
-    },
-  ];
 
   const plotData: Data[] = React.useMemo(() => {
     if (!metricData || !xAxisData) return [];

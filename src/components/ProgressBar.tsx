@@ -29,7 +29,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
       return () => clearInterval(intervalId);
     }
-  }, [isLoading, loadDuration]); // Dependency on isLoading to reset interval when a new load starts
+  }, [isLoading, loadDuration, progressCap]);
 
   // When isLoading changes to false, complete the progress bar
   useEffect(() => {

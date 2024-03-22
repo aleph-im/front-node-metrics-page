@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NodeMetricsPage from "./pages/NodeMetricsPage";
 import { themes, GlobalStyles, Logo } from "@aleph-front/core";
 import { ThemeProvider } from "styled-components";
