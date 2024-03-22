@@ -1,0 +1,91 @@
+name: Build and Deploy
+
+"on":
+  push:
+    branches:
+      - main
+jobs:
+  build-project:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            **/node_modules
+          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies and Build Project
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: "${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}"
+        run: |
+          npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+          npm config set "//npm.fontawesome.com/:_authToken" "${FONTAWESOME_NPM_AUTH_TOKEN}"
+          npm ci
+          npm run build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: aleph-node-metrics-build-artifact
+          path: |
+            build/
+            scripts/
+        id: aleph-node-metrics-build-artifact
+
+  push-to-ipfs:
+    needs: build-project
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: aleph-node-metrics-build-artifact
+
+      - name: Install aioipfs
+        run: |
+          pip install 'aioipfs>=0.6.2'
+
+      - name: Push on IPFS
+        run: |
+          IPFS_CID=$(python3 ./scripts/aleph_ipfs_push.py)
+          echo $IPFS_CID > ipfs_cid.txt
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ipfs-cid
+          path: ipfs_cid.txt
+
+  deploy:
+    needs: push-to-ipfs
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: ipfs-cid
+
+      - name: Read IPFS CID from downloaded artifact
+        id: ipfs_cid
+        run: echo "::set-output name=CID::$(cat ipfs_cid.txt)"
+
+      - name: Update the main node-metrics on https://node-metrics.gerardmolina.com
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir --parents /home/runner/.aleph-im/private-keys
+          echo ${{ secrets.ALEPH_PRIVATE_KEY }} | xxd -r -p > /home/runner/.aleph-im/private-keys/ethereum.key
+          pip install 'aleph-client==0.6.1'
+          ITEM_HASH=$(aleph file pin ${{ steps.ipfs_cid.outputs.CID }} | jq -r '.item_hash')
+          echo 'y' | aleph domain attach node-metrics.gerardmolina.com --item-hash $ITEM_HASH
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: aleph-node-metrics
+          path: out/
