@@ -1,19 +1,22 @@
-import React from "react";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import NodeMetricsPage from "./pages/NodeMetricsPage";
+import { themes, GlobalStyles, Logo } from "@aleph-front/core";
+import { ThemeProvider } from "styled-components";
 
 function App() {
   return (
     <Router>
-      <header className="flex flex-row bg-[#282c34] items-center text-white w-full text-center px-4">
-        <img src="/logo512.webp" height="40" width="40" />
-        <h1 className="font-bold text-2xl m-5">Node Metrics</h1>
-      </header>
-      <Switch>
-        <Route path="/">
-          <NodeMetricsPage />
-        </Route>
-      </Switch>
+      <ThemeProvider theme={themes.aleph}>
+        <GlobalStyles />
+        <header className="flex flex-row items-center w-full text-center px-16 pt-6">
+          <Logo text="Node Metrics" size="30" />
+        </header>
+        <Switch>
+          <Route path="/">
+            <NodeMetricsPage />
+          </Route>
+        </Switch>
+      </ThemeProvider>
     </Router>
   );
 }

@@ -68,16 +68,16 @@ const NodeMetricsPage: React.FC = () => {
   }, [metricData, xAxisData]);
 
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row ">
       <NodeList
         nodes={filteredNodes}
         selectedNode={selectedNode}
         searchTerm={searchTerm}
         onSelectNode={setSelectedNode}
         onSearchingNode={setSearchTerm}
-        className="overflow-y-scroll h-[calc(100vh-72px)] min-w-[226px] z-40 bg-white"
+        className="overflow-y-scroll h-[calc(100vh-77px)] min-w-[250px] z-40 "
       ></NodeList>
-      <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-72px)] p-8 z-30">
+      <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-77px)] p-8 z-30 bg-white text-black">
         <div className="flex flex-grow items-center justify-center w-full h-max">
           {isLoading ? (
             <div>

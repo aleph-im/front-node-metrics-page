@@ -14,9 +14,7 @@ const useFetchNodes = () => {
           (node: any) => ({
             hash: node.hash,
             name: node.name,
-            picture: node.picture
-              ? `https://api2.aleph.im/api/v0/storage/raw/${node.picture}`
-              : "/logo192.webp",
+            picture: node.picture,
             type: "core",
           })
         );
@@ -24,9 +22,7 @@ const useFetchNodes = () => {
           (node: any) => ({
             hash: node.hash,
             name: node.name,
-            picture: node.picture
-              ? `https://api2.aleph.im/api/v0/storage/raw/${node.picture}`
-              : "/logo192.webp",
+            picture: node.picture,
             type: "resource",
           })
         );
