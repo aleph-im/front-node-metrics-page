@@ -26,7 +26,16 @@ const MetricsPlot: React.FC<MetricsPlotProps> = ({ plotData, layout }) => {
         },
       ],
       type: "date",
+
       ...layout.xaxis,
+    },
+    legend: {
+      orientation: "h",
+      x: 0.5,
+      xanchor: "center",
+      y: -0.1,
+      yanchor: "top",
+      ...layout.legend,
     },
   };
 
