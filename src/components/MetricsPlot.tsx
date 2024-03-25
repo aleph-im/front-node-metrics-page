@@ -45,8 +45,6 @@ const MetricsPlot: React.FC<MetricsPlotProps> = ({
     },
   };
 
-  console.log(extendedLayout);
-
   return (
     <>
       {isLoadingMetrics ? (
