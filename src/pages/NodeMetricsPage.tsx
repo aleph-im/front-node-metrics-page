@@ -44,7 +44,7 @@ const NodeMetricsPage: React.FC = () => {
   };
 
   const xAxisData = metricData?.measured_at.map((timestamp) =>
-    new Date(timestamp * 1000).toLocaleString()
+    new Date(timestamp * 1000).toISOString()
   );
 
   const plotData: Data[] = React.useMemo(() => {
@@ -55,7 +55,7 @@ const NodeMetricsPage: React.FC = () => {
       if (metricArray && isMetricPresent(metricArray)) {
         acc.push({
           x: xAxisData,
-          y: metricArray.filter((item) => item !== null) as number[], // Ensure no null values in 'y'
+          y: metricArray,
           type: "scatter",
           mode: "lines+markers",
           name: name,
@@ -65,6 +65,18 @@ const NodeMetricsPage: React.FC = () => {
       return acc;
     }, []);
   }, [metricData, xAxisData]);
+
+  const plotLayout: Partial<Plotly.Layout> = React.useMemo(() => {
+    if (!xAxisData || !selectedNode) return {};
+
+    return {
+      autosize: true,
+      title: `${selectedNode?.name} Node Metrics`,
+      xaxis: {
+        range: [xAxisData[0], xAxisData[xAxisData.length - 1]],
+      },
+    };
+  }, [xAxisData, selectedNode]);
 
   return (
     <div className="flex flex-row ">
@@ -84,13 +96,9 @@ const NodeMetricsPage: React.FC = () => {
               <ProgressBar isLoading={isLoading} loadDuration={12000} />
             </div>
           ) : metricData ? (
-            <MetricsPlot
-              plotData={plotData}
-              layout={{
-                autosize: true,
-                title: `${selectedNode?.name} Node Metrics`,
-              }}
-            />
+            <>
+              <MetricsPlot plotData={plotData} layout={plotLayout} />
+            </>
           ) : (
             <div className="text-gray-500">
               Select a node to see its metrics.
