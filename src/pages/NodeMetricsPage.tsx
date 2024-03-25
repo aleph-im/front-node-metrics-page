@@ -7,6 +7,7 @@ import useFilteredNodes from "../hooks/useFilteredNodes";
 import { MetricData, Node } from "../types";
 import ProgressBar from "../components/ProgressBar";
 import NodeList from "../components/NodeList";
+import { Spinner } from "@aleph-front/core";
 
 const metricsConfig: {
   key: keyof MetricData;
@@ -33,11 +34,11 @@ const metricsConfig: {
 ];
 
 const NodeMetricsPage: React.FC = () => {
-  const nodes = useFetchNodes();
+  const { nodes, isLoadingNodes } = useFetchNodes();
   const [selectedNode, setSelectedNode] = useState<Node | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const filteredNodes = useFilteredNodes(nodes, searchTerm);
-  const { metricData, isLoading } = useFetchMetrics(selectedNode, nodes);
+  const { metricData, isLoadingMetrics } = useFetchMetrics(selectedNode, nodes);
 
   const isMetricPresent = (metric: (number | null)[]): boolean => {
     return metric.some((value) => value !== null);
@@ -81,6 +82,7 @@ const NodeMetricsPage: React.FC = () => {
   return (
     <div className="flex flex-row ">
       <NodeList
+        isLoading={isLoadingNodes}
         nodes={filteredNodes}
         selectedNode={selectedNode}
         searchTerm={searchTerm}
@@ -90,15 +92,17 @@ const NodeMetricsPage: React.FC = () => {
       ></NodeList>
       <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-77px)] p-8 z-30 bg-white text-black">
         <div className="flex flex-grow items-center justify-center w-full h-max">
-          {isLoading ? (
+          {isLoadingMetrics ? (
             <div>
               Loading metrics...
-              <ProgressBar isLoading={isLoading} loadDuration={12000} />
+              <ProgressBar isLoading={isLoadingMetrics} loadDuration={12000} />
             </div>
           ) : metricData ? (
             <>
               <MetricsPlot plotData={plotData} layout={plotLayout} />
             </>
+          ) : isLoadingNodes ? (
+            <Spinner color="#141327" />
           ) : (
             <div className="text-gray-500">
               Select a node to see its metrics.

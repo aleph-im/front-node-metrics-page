@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { MetricData, Node } from "../types";
 
 const useFetchMetrics = (selectedNode: Node | undefined, nodes: Node[]) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
   const [metricData, setMetricData] = useState<MetricData | null>(null);
 
   useEffect(() => {
@@ -11,7 +11,7 @@ const useFetchMetrics = (selectedNode: Node | undefined, nodes: Node[]) => {
     const node = nodes.find((n) => n.hash === selectedNode.hash);
     if (!node) return;
 
-    setIsLoading(true);
+    setIsLoadingMetrics(true);
     const baseUrl = "https://api2.aleph.im/api/v0";
 
     const endpoint =
@@ -34,15 +34,15 @@ const useFetchMetrics = (selectedNode: Node | undefined, nodes: Node[]) => {
       .then((response) => response.json())
       .then((data) => {
         setMetricData(data.metrics);
-        setIsLoading(false);
+        setIsLoadingMetrics(false);
       })
       .catch((error) => {
         console.error("Error fetching metric data for node:", error);
-        setIsLoading(false);
+        setIsLoadingMetrics(false);
       });
   }, [selectedNode, nodes]);
 
-  return { metricData, isLoading };
+  return { metricData, isLoadingMetrics };
 };
 
 export default useFetchMetrics;
