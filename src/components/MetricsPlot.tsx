@@ -8,10 +8,34 @@ interface MetricsPlotProps {
 }
 
 const MetricsPlot: React.FC<MetricsPlotProps> = ({ plotData, layout }) => {
+  const extendedLayout: Partial<Plotly.Layout> = {
+    ...layout,
+    xaxis: {
+      tickformatstops: [
+        {
+          dtickrange: [null, 3600000], // For less than an hour
+          value: "%H:%M:%S %d/%m/%Y", // Show full date and time
+        },
+        {
+          dtickrange: [3600000, 86400000], // For an hour to one day
+          value: "%H:%M %d/%m/%Y", // Show hour and date
+        },
+        {
+          dtickrange: [86400000, null], // For more than a day
+          value: "%d/%m/%Y", // Show only date
+        },
+      ],
+      type: "date",
+      ...layout.xaxis,
+    },
+  };
+
+  console.log(extendedLayout);
+
   return (
     <Plot
       data={plotData}
-      layout={layout}
+      layout={extendedLayout}
       config={{ responsive: true }}
       useResizeHandler={true}
       style={{ width: "100%", height: "100%" }}
