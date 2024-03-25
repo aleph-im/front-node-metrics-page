@@ -13,12 +13,24 @@ const useFetchMetrics = (selectedNode: Node | undefined, nodes: Node[]) => {
 
     setIsLoading(true);
     const baseUrl = "https://api2.aleph.im/api/v0";
+
     const endpoint =
       node.type === "resource"
         ? `${baseUrl}/compute/${node.hash}/metrics`
         : `${baseUrl}/core/${node.hash}/metrics`;
 
-    fetch(endpoint)
+    const url = new URL(endpoint, baseUrl);
+
+    const endDate = Math.floor(Date.now() / 1000); // current time (in seconds)
+    const startDate = endDate - 2 * 7 * 24 * 60 * 60; // 2 weeks from now (in seconds)
+
+    url.search = new URLSearchParams({
+      start_date: startDate.toString(),
+      end_date: endDate.toString(),
+      sort: "asc",
+    }).toString();
+
+    fetch(url.toString())
       .then((response) => response.json())
       .then((data) => {
         setMetricData(data.metrics);

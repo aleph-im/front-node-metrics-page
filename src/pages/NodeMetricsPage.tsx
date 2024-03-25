@@ -55,7 +55,7 @@ const NodeMetricsPage: React.FC = () => {
       if (metricArray && isMetricPresent(metricArray)) {
         acc.push({
           x: xAxisData,
-          y: metricArray.filter((item) => item !== null) as number[], // Ensure no null values in 'y'
+          y: metricArray,
           type: "scatter",
           mode: "lines+markers",
           name: name,
