@@ -5,7 +5,6 @@ import useFetchNodes from "../hooks/useFetchNodes";
 import useFetchMetrics from "../hooks/useFetchMetrics";
 import useFilteredNodes from "../hooks/useFilteredNodes";
 import { MetricData, Node } from "../types";
-import ProgressBar from "../components/ProgressBar";
 import NodeList from "../components/NodeList";
 import { Spinner } from "@aleph-front/core";
 
@@ -92,17 +91,14 @@ const NodeMetricsPage: React.FC = () => {
       ></NodeList>
       <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-77px)] p-8 z-30 bg-white text-black">
         <div className="flex flex-grow items-center justify-center w-full h-max">
-          {isLoadingMetrics ? (
-            <div>
-              Loading metrics...
-              <ProgressBar isLoading={isLoadingMetrics} loadDuration={12000} />
-            </div>
-          ) : metricData ? (
-            <>
-              <MetricsPlot plotData={plotData} layout={plotLayout} />
-            </>
-          ) : isLoadingNodes ? (
+          {isLoadingNodes ? (
             <Spinner color="#141327" />
+          ) : selectedNode ? (
+            <MetricsPlot
+              isLoadingMetrics={isLoadingMetrics}
+              plotData={plotData}
+              layout={plotLayout}
+            />
           ) : (
             <div className="text-gray-500">
               Select a node to see its metrics.
