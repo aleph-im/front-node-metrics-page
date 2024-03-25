@@ -1,0 +1,32 @@
+name: Build
+
+on: pull_request
+
+jobs:
+  build-project:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            **/node_modules
+          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies and Build Project
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: "${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}"
+        run: |
+          npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+          npm config set "//npm.fontawesome.com/:_authToken" "${FONTAWESOME_NPM_AUTH_TOKEN}"
+          npm ci
+          npm run build
