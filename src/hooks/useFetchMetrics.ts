@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { MetricData, Node } from "../types";
 
 const useFetchMetrics = (selectedNode: Node | undefined, nodes: Node[]) => {
-  const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
   const [metricData, setMetricData] = useState<MetricData | null>(null);
 
   useEffect(() => {
