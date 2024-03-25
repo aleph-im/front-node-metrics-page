@@ -1,8 +1,9 @@
 import React from "react";
 import { Node } from "../types";
-import { Icon, NodeName, TextInput } from "@aleph-front/core";
+import { Icon, NodeName, Spinner, TextInput } from "@aleph-front/core";
 
 interface NodeListProps {
+  isLoading: boolean;
   nodes: Node[];
   selectedNode?: Node;
   searchTerm: string;
@@ -12,6 +13,7 @@ interface NodeListProps {
 }
 
 const NodeList: React.FC<NodeListProps> = ({
+  isLoading,
   nodes,
   selectedNode,
   searchTerm,
@@ -38,27 +40,33 @@ const NodeList: React.FC<NodeListProps> = ({
           icon={<Icon name="search" size="lg" />}
         />
       </div>
-      <ul className="divide-y divide-gray-100">
-        {nodes.map((node) => (
-          <>
-            <li
-              className={`flex justify-between gap-x-6 py-5 py-0:[&:last-child] px-4 ${
-                selectedNode?.hash === node?.hash ? "bg-[#029aff]" : ""
-              }`}
-              key={node.hash}
-              onClick={() => handleNodeSelection(node)}
-            >
-              <NodeName
-                apiServer="https://api2.aleph.im"
-                ImageCmp={{}}
-                hash={node.hash}
-                name={node.name}
-                picture={node.picture}
-              />
-            </li>
-          </>
-        ))}
-      </ul>
+      {isLoading ? (
+        <div className="flex flex-col justify-center items-center w-full h-full">
+          <Spinner />
+        </div>
+      ) : (
+        <ul className="divide-y divide-gray-100">
+          {nodes.map((node) => (
+            <>
+              <li
+                className={`flex justify-between gap-x-6 py-5 py-0:[&:last-child] px-4 ${
+                  selectedNode?.hash === node?.hash ? "bg-[#029aff]" : ""
+                }`}
+                key={node.hash}
+                onClick={() => handleNodeSelection(node)}
+              >
+                <NodeName
+                  apiServer="https://api2.aleph.im"
+                  ImageCmp={{}}
+                  hash={node.hash}
+                  name={node.name}
+                  picture={node.picture}
+                />
+              </li>
+            </>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

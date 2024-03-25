@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { Node } from "../types";
 
 const useFetchNodes = () => {
+  const [isLoadingNodes, setIsLoadingNodes] = useState(false);
   const [nodes, setNodes] = useState<Node[]>([]);
 
   useEffect(() => {
+    setIsLoadingNodes(true);
+
     fetch(
       "https://api3.aleph.im/api/v0/aggregates/0xa1B3bb7d2332383D96b7796B908fB7f7F3c2Be10.json?keys=corechannel"
     )
@@ -27,11 +30,15 @@ const useFetchNodes = () => {
           })
         );
         setNodes([...coreNodes, ...resourceNodes]);
+        setIsLoadingNodes(false);
       })
-      .catch((error) => console.error("Error fetching nodes:", error));
+      .catch((error) => {
+        console.error("Error fetching nodes:", error);
+        setIsLoadingNodes(false);
+      });
   }, []);
 
-  return nodes;
+  return { nodes, isLoadingNodes };
 };
 
 export default useFetchNodes;
