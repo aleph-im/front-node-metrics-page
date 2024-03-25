@@ -7,6 +7,7 @@ import useFilteredNodes from "../hooks/useFilteredNodes";
 import { MetricData, Node } from "../types";
 import ProgressBar from "../components/ProgressBar";
 import NodeList from "../components/NodeList";
+import { Spinner } from "@aleph-front/core";
 
 const metricsConfig: {
   key: keyof MetricData;
@@ -100,6 +101,8 @@ const NodeMetricsPage: React.FC = () => {
             <>
               <MetricsPlot plotData={plotData} layout={plotLayout} />
             </>
+          ) : isLoadingNodes ? (
+            <Spinner color="#141327" />
           ) : (
             <div className="text-gray-500">
               Select a node to see its metrics.

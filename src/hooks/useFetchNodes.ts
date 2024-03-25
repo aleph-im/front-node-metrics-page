@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Node } from "../types";
 
 const useFetchNodes = () => {
-  const [isLoadingNodes, setIsLoadingNodes] = useState(false);
+  const [isLoadingNodes, setIsLoadingNodes] = useState(true);
   const [nodes, setNodes] = useState<Node[]>([]);
 
   useEffect(() => {
