@@ -1,13 +1,19 @@
 import React from "react";
 import Plot from "react-plotly.js";
 import { Data } from "plotly.js";
+import ProgressBar from "./ProgressBar";
 
 interface MetricsPlotProps {
+  isLoadingMetrics: boolean;
   plotData: Data[];
   layout: Partial<Plotly.Layout>;
 }
 
-const MetricsPlot: React.FC<MetricsPlotProps> = ({ plotData, layout }) => {
+const MetricsPlot: React.FC<MetricsPlotProps> = ({
+  isLoadingMetrics,
+  plotData,
+  layout,
+}) => {
   const extendedLayout: Partial<Plotly.Layout> = {
     ...layout,
     xaxis: {
@@ -39,16 +45,23 @@ const MetricsPlot: React.FC<MetricsPlotProps> = ({ plotData, layout }) => {
     },
   };
 
-  console.log(extendedLayout);
-
   return (
-    <Plot
-      data={plotData}
-      layout={extendedLayout}
-      config={{ responsive: true }}
-      useResizeHandler={true}
-      style={{ width: "100%", height: "100%" }}
-    />
+    <>
+      {isLoadingMetrics ? (
+        <div>
+          Loading metrics...
+          <ProgressBar isLoading={isLoadingMetrics} loadDuration={12000} />
+        </div>
+      ) : (
+        <Plot
+          data={plotData}
+          layout={extendedLayout}
+          config={{ responsive: true }}
+          useResizeHandler={true}
+          style={{ width: "100%", height: "100%" }}
+        />
+      )}
+    </>
   );
 };
 
