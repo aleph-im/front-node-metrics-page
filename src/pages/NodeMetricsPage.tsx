@@ -7,6 +7,7 @@ import useFilteredNodes from "../hooks/useFilteredNodes";
 import { MetricData, Node } from "../types";
 import NodeList from "../components/NodeList";
 import { Spinner } from "@aleph-front/core";
+import MetricsPlotPlotly from "../components/MetricsPlotPlotly";
 
 const metricsConfig: {
   key: keyof MetricData;
@@ -38,6 +39,30 @@ const NodeMetricsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const filteredNodes = useFilteredNodes(nodes, searchTerm);
   const { metricData, isLoadingMetrics } = useFetchMetrics(selectedNode, nodes);
+
+  const metricsConfig2: {
+    key: keyof MetricData;
+    name: string;
+    hide?: boolean;
+  }[] = [
+    { key: "base_latency", name: "Base Latency" },
+    { key: "base_latency_ipv4", name: "Base Latency IPv4" },
+    { key: "full_check_latency", name: "Full Check Latency" },
+    { key: "diagnostic_vm_latency", name: "Diagnostic VM Latency" },
+    { key: "metrics_latency", name: "Metrics Latency" },
+    { key: "aggregate_latency", name: "Aggregate Latency" },
+    { key: "file_download_latency", name: "File Download Latency" },
+    {
+      key: "pending_messages",
+      name: "Pending Messages",
+      hide: true,
+    },
+    {
+      key: "eth_height_remaining",
+      name: "ETH Height Remaining",
+      hide: true,
+    },
+  ];
 
   const isMetricPresent = (metric: (number | null)[]): boolean => {
     return metric.some((value) => value !== null);
@@ -78,6 +103,27 @@ const NodeMetricsPage: React.FC = () => {
     };
   }, [xAxisData, selectedNode]);
 
+  // Recharts
+
+  const plotData2 = React.useMemo(() => {
+    if (!metricData || !xAxisData) return [];
+
+    // Initialize an array to hold the combined data for all metrics at each x-axis point
+    const combinedData = xAxisData.map((date, index) => {
+      const dataPoint: any = { name: date }; // Assuming date is your x-axis label
+      metricsConfig2.forEach(({ key, name, hide }) => {
+        const metricArray = metricData[key];
+        if (metricArray && metricArray[index] !== null) {
+          // Add each metric to the dataPoint by its name, with value at current index
+          dataPoint[name] = metricArray[index];
+        }
+      });
+      return dataPoint;
+    });
+
+    return combinedData;
+  }, [metricData, xAxisData]);
+
   return (
     <div className="flex flex-row ">
       <NodeList
@@ -94,11 +140,19 @@ const NodeMetricsPage: React.FC = () => {
           {isLoadingNodes ? (
             <Spinner color="#141327" />
           ) : selectedNode ? (
-            <MetricsPlot
-              isLoadingMetrics={isLoadingMetrics}
-              plotData={plotData}
-              layout={plotLayout}
-            />
+            <>
+              <MetricsPlotPlotly
+                isLoadingMetrics={isLoadingMetrics}
+                plotData={plotData}
+                layout={plotLayout}
+              />
+              <MetricsPlot
+                isLoadingMetrics={isLoadingMetrics}
+                plotData={plotData2}
+                plotConfig={metricsConfig2}
+                selectedNodeName={selectedNode.name}
+              />
+            </>
           ) : (
             <div className="text-gray-500">
               Select a node to see its metrics.
