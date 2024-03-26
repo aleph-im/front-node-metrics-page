@@ -60,7 +60,8 @@ const NodeList: React.FC<NodeListProps> = ({
                   ImageCmp={{}}
                   hash={node.hash}
                   name={node.name}
-                  picture={node.picture}
+                  // TODO: Re-enable picture when thumbnail service is available
+                  // picture={node.picture}
                 />
               </li>
             </>
