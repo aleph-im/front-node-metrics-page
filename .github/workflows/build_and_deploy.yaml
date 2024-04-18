@@ -76,14 +76,14 @@ jobs:
         id: ipfs_cid
         run: echo "::set-output name=CID::$(cat ipfs_cid.txt)"
 
-      - name: Update the main node-metrics on https://node-metrics.gerardmolina.com
+      - name: Update the main node-metrics on https://node-metrics.aleph.cloud
         if: github.ref == 'refs/heads/main'
         run: |
           mkdir --parents /home/runner/.aleph-im/private-keys
           echo ${{ secrets.ALEPH_PRIVATE_KEY }} | xxd -r -p > /home/runner/.aleph-im/private-keys/ethereum.key
           pip install 'aleph-client==0.6.1'
           ITEM_HASH=$(aleph file pin ${{ steps.ipfs_cid.outputs.CID }} | jq -r '.item_hash')
-          echo 'y' | aleph domain attach node-metrics.gerardmolina.com --item-hash $ITEM_HASH
+          echo 'y' | aleph domain attach node-metrics.aleph.cloud --item-hash $ITEM_HASH
 
       - uses: actions/upload-artifact@v3
         with:
