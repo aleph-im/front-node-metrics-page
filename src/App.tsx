@@ -2,15 +2,14 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NodeMetricsPage from "./pages/NodeMetricsPage";
 import { themes, GlobalStyles, Logo } from "@aleph-front/core";
 import { ThemeProvider } from "styled-components";
+import Header from "./components/Header";
 
 function App() {
   return (
     <Router>
       <ThemeProvider theme={themes.aleph}>
         <GlobalStyles />
-        <header className="flex flex-row items-center w-full text-center px-16 pt-6">
-          <Logo text="Node Metrics" size="30" />
-        </header>
+        <Header />
         <Switch>
           <Route path="/">
             <NodeMetricsPage />
